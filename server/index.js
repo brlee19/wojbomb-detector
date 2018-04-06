@@ -5,6 +5,7 @@ const twitter = require('../helpers/twitter.js')
 
 let app = express();
 app.use(bodyParser());
+twitter.streamNBA();
 
 app.get('/', (req, res) => {
   console.log('get request for index.html');
@@ -26,6 +27,15 @@ app.get('/faves', (req, res) => {
     })
     res.send(tweetText);
   });
+})
+
+app.get('/nba', (req, res) => {
+  // twitter.searchNBA(tweets => {
+  //   res.send();
+  //   // console.log(tweets);
+  //   // res.send(tweets);
+  // })
+  // twitter.streamNBA();
 })
 
 app.post('/', (req, res) => { //add user to follow
