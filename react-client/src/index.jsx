@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import Tweet from './components/Tweet.jsx';
+import axios from 'axios';
 
 class App extends React.Component {
   constructor(props) {
@@ -12,18 +13,11 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    $.ajax({
-      url: '/hot', 
-      success: (tweets) => {
-        this.setState({
-          tweets: tweets
-        });
-        console.log('first tweet');
-      },
-      error: (err) => {
-        console.log('err', err);
-      }
-    });
+    axios.get('/hot')
+      .then((resp) => {
+        this.setState({tweets: resp.data});
+      })
+      .catch(err => console.log('axios err', err));
   }
 
   render () {
