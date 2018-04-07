@@ -25,8 +25,7 @@ class Search extends React.Component {
     return (
       <div>
       <h4>Add a topic to stream!</h4>
-      <pre>{this.state.term}</pre>
-      Add an additional topic to stream: <input value={this.state.term} onChange={this.onChange}/>       
+      Enter topic here: <input value={this.state.term} onChange={this.onChange}/>       
       <button onClick={this.search}> ADD </button>
       </div>
     )

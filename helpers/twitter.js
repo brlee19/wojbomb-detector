@@ -12,7 +12,7 @@ let client = new Twitter({
  
 const params = {screen_name: config.SCREEN_NAME};
 const rtInterval = 60000; // the interval after which to recheck a tweet
-const rtDif = 2; //the number of rts during the interval that make a tweet count as hot
+const rtDif = 1; //the number of rts during the interval that make a tweet count as hot
 
 const stream = (query) => {
   //To do: add these to a db too and add an option to easily add new people to follow this way
