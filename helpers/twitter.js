@@ -11,8 +11,8 @@ let client = new Twitter({
 });
  
 const params = {screen_name: config.SCREEN_NAME};
-const rtInterval = 6000; // the interval after which to recheck a tweet
-const rtDif = 1; //the number of rts during the interval that make a tweet count as hot
+const rtInterval = 60000; // the interval after which to recheck a tweet
+const rtDif = 2; //the number of rts during the interval that make a tweet count as hot
 
 const stream = (query) => {
   //To do: add these to a db too and add an option to easily add new people to follow this way
@@ -61,12 +61,11 @@ const checkRTIncrease = (id, oldRetweetCount) => {
           if (data) console.log('saved hot tweet');
         });
       } else {
-        console.log('trying to delete tweet with id', tweet.id_str);
+        // console.log('trying to delete tweet with id', tweet.id_str);
         db.deleteTweet(tweet.id_str)
-          .then((deleted) => console.log('deleted tweet?', deleted))
+          .then((deleted) => {console.log('deleted tweet with id_str', tweet.id_str)})
           .catch(err => console.log('error trying to delete tweet', err));
       }
-      //else delete tweet from DB so it doesn't store a billion tweets
     }
   });
 }

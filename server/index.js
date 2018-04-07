@@ -13,15 +13,6 @@ app.use(bodyParser.json());
 
 twitter.stream('NBA');
 
-// app.get('/', (req, res) => {
-//   console.log('get request for index.html');
-//   res.send('Hello world!');
-// });
-
-// app.get('/', (req, res) => {
-
-// })
-
 app.get('/hot', (req, res) => { 
   return db.getHotTweets().then((data) => {
       // console.log(`data from getHotTweets is ${data}`);
