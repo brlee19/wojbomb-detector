@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/tweets');
 
 let tweetSchema = mongoose.Schema({
-  id: {type: Number, unique: true},//make unique!
+  id: {type: Number, unique: true}, //make unique!
+  url: String,
   strId: String, 
   text: String,
   userId: Number,
@@ -16,6 +17,7 @@ let Tweet = mongoose.model('Tweet', tweetSchema);
 const saveTweet = (tweet) => { //will generally be saving 1 tweet at a time, not in a collection
   return new Tweet({
     id: tweet.id,
+    url: `https://twitter.com/${tweet.user.id}/status/tweet.id_str`,
     strId: tweet.id_str,
     text: tweet.text,
     userId: tweet.user.id,
@@ -31,11 +33,13 @@ const searchTweetById = (id) => { //returns a promise b/c of exec?
               .exec()
 };
 
-const checkRTIncrease = (id) => {
-  twitter.getTweetById(id);
-    //make another get request to twitter by ID
-}
+// const checkRTIncrease = (id) => {
+//   twitter.getTweetById(id, (err, tweet) => {
+//     console.log(tweet);
+//   });
+//     //make another get request to twitter by ID
+// }
 
 exports.saveTweet = saveTweet;
 exports.searchTweetById = searchTweetById;
-exports.checkRTIncrease = checkRTIncrease;
+// exports.checkRTIncrease = checkRTIncrease;

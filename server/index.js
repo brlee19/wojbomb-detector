@@ -45,8 +45,11 @@ app.post('/', (req, res) => { //add user to follow
 });
 
 app.get('/*', (req, res) => {
-  twitter.getTweetById(req.url);
-  res.send('tried searching by id');
+  console.log('url is', req.url);
+  twitter.getTweetById(req.url.slice(1), (err, tweet) => {
+    console.log('tweet is', tweet);
+    res.send('tried searching by id');
+  });
 });
 
 app.listen(port, function() {

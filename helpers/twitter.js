@@ -55,11 +55,10 @@ const streamNBA = () => {
         db.saveTweet(tweet)
           .then((data) => {
             console.log('saved tweet successfully');
-            console.log('data here is', data);
-            //data.id is the tweet ID
-            //setTimeout and check up on tweet later
+            console.log('data here is', data); //data is tweet model
+            console.log(`# of RTs at ${new Date()} is ${data.RTs}`);
             setTimeout(function() {
-              db.checkRTIncrease(data.id);
+              checkRTIncrease(data.strId, data.RTs);
             }, 5000);
           })
           .catch(() => {
@@ -80,14 +79,27 @@ const streamNBA = () => {
   });
 }
 
-const getTweetById = (strId) => {
+const checkRTIncrease = (id, oldRetweetCount) => {
+  getTweetById(id, (err, tweet) => {
+    console.log(tweet);
+    if (err) console.log(err);
+    else {
+      const retweetDifference = tweet.retweet_count - oldRetweetCount;
+      console.log(`# of RTs at ${new Date()} is ${tweet.retweet_count}, a difference of ${retweetDifference}`);
+    }
+  });
+    //make another get request to twitter by ID
+}
+
+const getTweetById = (strId, cb) => {
   client.get('statuses/show', {id: strId}, function(error, tweet, response) {
     if (error) {
       console.log(error);
-      throw error;
+      cb(error, null);
     }
     else {
-      console.log('searched for tweet by id and got', tweet);
+      // console.log('searched for tweet by id and got', tweet);
+      cb(null, tweet);
     }
     // console.log(tweet);  
     // console.log(response);  
