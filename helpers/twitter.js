@@ -5,7 +5,8 @@ const db = require('../database/index.js');
 CONSUMER_KEY = process.env.CONSUMER_KEY || require('../config.js').CONSUMER_KEY;
 CONSUMER_SECRET = process.env.CONSUMER_SECRET || require('../config.js').CONSUMER_SECRET;
 ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY || require('../config.js').ACCESS_TOKEN_KEY;
-ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || require('...config.js').ACCESS_TOKEN_SECRET;
+ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || require('../config.js').ACCESS_TOKEN_SECRET;
+SCREEN_NAME = process.env.SCREEN_NAME || require('../config.js').SCREEN_NAME;
 
 let client = new Twitter({
   consumer_key: CONSUMER_KEY,
@@ -14,7 +15,7 @@ let client = new Twitter({
   access_token_secret: ACCESS_TOKEN_SECRET
 });
  
-const params = {screen_name: process.env.SCREEN_NAME || config.SCREEN_NAME};
+const params = {screen_name: SCREEN_NAME};
 const rtInterval = 60000; // the interval after which to recheck a tweet
 const rtDif = 1; //the number of rts during the interval that make a tweet count as hot
 
