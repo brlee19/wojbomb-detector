@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-// import List from './components/List.jsx';
+import Tweet from './components/Tweet.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -14,10 +14,11 @@ class App extends React.Component {
   componentDidMount() {
     $.ajax({
       url: '/hot', 
-      success: (data) => {
+      success: (tweets) => {
         this.setState({
-          tweets: data
-        })
+          tweets: tweets
+        });
+        console.log('first tweet');
       },
       error: (err) => {
         console.log('err', err);
@@ -26,10 +27,12 @@ class App extends React.Component {
   }
 
   render () {
+    if (!this.state.tweets.length) return (<div></div>)
     return (<div>
-      <h1>Item List</h1>
-      <pre>{this.state.tweets[0] || 'no tweets'}</pre>
-      <List items={this.state.items}/>
+      <h1>Hot Tweets</h1>
+      {this.state.tweets.map(tweet => {
+        return <Tweet tweet={tweet} key={tweet.id}/>
+      })}  
     </div>)
   }
 }
