@@ -16,6 +16,10 @@ let tweetSchema = mongoose.Schema({
 let Tweet = mongoose.model('Tweet', tweetSchema);
 
 const saveTweet = (tweet) => { //will generally be saving 1 tweet at a time, not in a collection
+  // if (tweet['possibly_sensitive']) {
+  //   console.log('inapprops...sending back empty promise');
+  //   return Promise.resolve();
+  // }
   return new Tweet({
     id: tweet.id,
     url: `https://twitter.com/${tweet.user.id}/status/${tweet.id_str}`,

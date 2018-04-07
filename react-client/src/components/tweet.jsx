@@ -9,6 +9,7 @@ const Tweet = ({tweet}) => (
   <ul>
     <li>{tweet.userHandle}</li>
     <li>{tweet.text}</li>
+    <li>RTs: {tweet.RTs}</li>
     <li><a href={tweet.url}>Link!</a></li>
   </ul>
   </div>

@@ -30,10 +30,10 @@ class App extends React.Component {
   }
 
   render () {
-    if (!this.state.tweets.length) return (<div></div>)
+    if (!this.state.tweets.length) return (<div><h1>Hot Tweets</h1></div>)
     return (<div>
       <h1>Hot Tweets</h1>
-      {this.state.tweets.map(tweet => {
+      {this.state.tweets.reverse().map(tweet => {
         return <Tweet tweet={tweet} key={tweet.id}/>
       })}  
     </div>)
