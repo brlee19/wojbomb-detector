@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000;
-const twitter = require('../helpers/twitter.js')
+const twitter = require('../helpers/twitter.js');
+const db = require('../database/index.js');
 
 let app = express();
 app.use(bodyParser());
@@ -29,13 +30,8 @@ app.get('/faves', (req, res) => {
   });
 })
 
-app.get('/nba', (req, res) => {
-  // twitter.searchNBA(tweets => {
-  //   res.send();
-  //   // console.log(tweets);
-  //   // res.send(tweets);
-  // })
-  // twitter.streamNBA();
+app.get('/hot', (req, res) => {
+
 })
 
 app.post('/', (req, res) => { //add user to follow

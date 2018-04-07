@@ -10,41 +10,14 @@ let client = new Twitter({
   access_token_secret: config.ACCESS_TOKEN_SECRET
 });
  
-var params = {screen_name: config.SCREEN_NAME};
-
-const getFaves = (cb) => {
-  client.get('favorites/list', function(error, tweets, response) {
-    if(error) throw error;
-    cb(tweets);
-  });
-}
-
-// const searchNBA = (cb) => {
-//   client.get('search/tweets', {q: 'nba'}, (err, tweets, res) => {
-//     // console.log('tweets are', tweets.statuses);
-//     const date = new Date();
-//     console.log('current date is', date);
-//     mappedTweets = (tweets.statuses).map(tweet => {
-//       return {
-//         tweetId: tweet.id,
-//         text: tweet.text,
-//         user: tweet.user.id,
-//         screenName: tweet.user.screen_name,
-//         RTs: [{date: new Date(), retweets: tweet.retweet_count}] //need to store dates with RTs to compare
-//         //faves: {faves: tweet.favorite_count}
-//         //need to save current time too
-//       };
-//       // return tweet
-//     });
-//     console.log('tweets are', JSON.stringify(mappedTweets));
-//     cb(mappedTweets);
-//   });
-// }
+const params = {screen_name: config.SCREEN_NAME};
+const rtInterval = 300000; // the interval after which to recheck a tweet
+const rtDif = 5; //the number of rts during the interval that make a tweet count as hot
 
 const streamNBA = () => {
   const params = {
-    follow: '50323173, 178580925, 1071182324, 23378774, 30074516' //should be based on user input and who they want to follow
-    //track: 'NBA'
+    // follow: '50323173, 178580925, 1071182324, 23378774, 30074516, 772164285388709888, 416814339' //should be based on user input and who they want to follow
+    track: 'NBA'
   };
 
   console.log('streaming from twitter');
@@ -54,23 +27,17 @@ const streamNBA = () => {
       if (tweet.text.slice(0,2) !== 'RT') {
         db.saveTweet(tweet)
           .then((data) => {
-            console.log('saved tweet successfully');
-            console.log('data here is', data); //data is tweet model
-            console.log(`# of RTs at ${new Date()} is ${data.RTs}`);
+            // console.log('saved tweet successfully');
+            // console.log('data here is', data); //data is tweet model
+            console.log(`# of RTs of tweet ${data.url} at ${new Date()} is ${data.RTs}`);
             setTimeout(function() {
               checkRTIncrease(data.strId, data.RTs);
-            }, 5000);
+            }, rtInterval);
           })
           .catch(() => {
             console.log('unable to save tweet in DB :(');
           })
       }
-      // console.log(tweet.text);
-      // add tweet to db
-      // setTimeout for x minutes
-      // check up on tweet again
-        // if hot, render to client
-        // if not, delete from DB
   });
 
   stream.on('error', function(error) {
@@ -81,11 +48,19 @@ const streamNBA = () => {
 
 const checkRTIncrease = (id, oldRetweetCount) => {
   getTweetById(id, (err, tweet) => {
-    console.log(tweet);
+    // console.log(tweet);
     if (err) console.log(err);
     else {
       const retweetDifference = tweet.retweet_count - oldRetweetCount;
-      console.log(`# of RTs at ${new Date()} is ${tweet.retweet_count}, a difference of ${retweetDifference}`);
+      console.log(`# of RTs of tweet ${tweet.id} at ${new Date()} is ${tweet.retweet_count}, a difference of ${retweetDifference}`);
+      if (retweetDifference > rtDif) {
+        console.log('hot tweet found!');
+        db.flagTweetAsHot(tweet.id, tweet.retweet_count).exec((err, data) => {
+          if (err) console.log(err);
+          if (data) console.log(`data passed from flagging tweet as hot is ${data}`);
+        });
+      }
+      //if enough of a difference, change the hot field to true (get request by client later returns only these hot tweets)
     }
   });
     //make another get request to twitter by ID
@@ -107,177 +82,7 @@ const getTweetById = (strId, cb) => {
 }
 
 // exports.getBearerToken = getBearerToken;
-exports.getFaves = getFaves;
+// exports.getFaves = getFaves;
 // exports.searchNBA = searchNBA;
 exports.streamNBA = streamNBA;
 exports.getTweetById = getTweetById;
-
-// SAMPLE RT
-
-// { created_at: 'Fri Apr 06 22:22:07 +0000 2018',
-//   id: 982382974069960700,
-//   id_str: '982382974069960704',
-//   text: 'RT @wojespn: My ride to a Raptors game in the @Klow7-mobile: https://t.co/jGZ0paEwAI',
-//   source: '<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>',
-//   truncated: false,
-//   in_reply_to_status_id: null,
-//   in_reply_to_status_id_str: null,
-//   in_reply_to_user_id: null,
-//   in_reply_to_user_id_str: null,
-//   in_reply_to_screen_name: null,
-//   user: 
-//    { id: 262917876,
-//      id_str: '262917876',
-//      name: '🌶',
-//      screen_name: 'rapsciity',
-//      location: 'toronto',
-//      url: null,
-//      description: '@raptors | 18 | 56-22',
-//      translator_type: 'regular',
-//      protected: false,
-//      verified: false,
-//      followers_count: 12025,
-//      friends_count: 208,
-//      listed_count: 51,
-//      favourites_count: 28615,
-//      statuses_count: 59101,
-//      created_at: 'Wed Mar 09 01:02:36 +0000 2011',
-//      utc_offset: -10800,
-//      time_zone: 'Atlantic Time (Canada)',
-//      geo_enabled: true,
-//      lang: 'en',
-//      contributors_enabled: false,
-//      is_translator: false,
-//      profile_background_color: '1A1B1F',
-//      profile_background_image_url: 'http://pbs.twimg.com/profile_background_images/378800000177936385/08y5XH-o.jpeg',
-//      profile_background_image_url_https: 'https://pbs.twimg.com/profile_background_images/378800000177936385/08y5XH-o.jpeg',
-//      profile_background_tile: true,
-//      profile_link_color: '1A1B1F',
-//      profile_sidebar_border_color: 'FFFFFF',
-//      profile_sidebar_fill_color: 'DAECF4',
-//      profile_text_color: '663B12',
-//      profile_use_background_image: true,
-//      profile_image_url: 'http://pbs.twimg.com/profile_images/978820478704926720/DWePinsu_normal.jpg',
-//      profile_image_url_https: 'https://pbs.twimg.com/profile_images/978820478704926720/DWePinsu_normal.jpg',
-//      profile_banner_url: 'https://pbs.twimg.com/profile_banners/262917876/1522204078',
-//      default_profile: false,
-//      default_profile_image: false,
-//      following: null,
-//      follow_request_sent: null,
-//      notifications: null },
-//   geo: null,
-//   coordinates: null,
-//   place: null,
-//   contributors: null,
-//   retweeted_status: 
-//    { created_at: 'Fri Apr 06 20:19:42 +0000 2018',
-//      id: 982352167196557300,
-//      id_str: '982352167196557312',
-//      text: 'My ride to a Raptors game in the @Klow7-mobile: https://t.co/jGZ0paEwAI',
-//      source: '<a href="http://twitter.com" rel="nofollow">Twitter Web Client</a>',
-//      truncated: false,
-//      in_reply_to_status_id: null,
-//      in_reply_to_status_id_str: null,
-//      in_reply_to_user_id: null,
-//      in_reply_to_user_id_str: null,
-//      in_reply_to_screen_name: null,
-//      user: 
-//       { id: 50323173,
-//         id_str: '50323173',
-//         name: 'Adrian Wojnarowski',
-//         screen_name: 'wojespn',
-//         location: null,
-//         url: 'http://es.pn/2BrPJmN',
-//         description: 'ESPN Senior NBA Insider. http://ESPN.com. SportsCenter. NBA Countdown. Host of The Woj Pod.',
-//         translator_type: 'none',
-//         protected: false,
-//         verified: true,
-//         followers_count: 2289260,
-//         friends_count: 627,
-//         listed_count: 24260,
-//         favourites_count: 4692,
-//         statuses_count: 13741,
-//         created_at: 'Wed Jun 24 14:43:40 +0000 2009',
-//         utc_offset: -14400,
-//         time_zone: 'Eastern Time (US & Canada)',
-//         geo_enabled: false,
-//         lang: 'en',
-//         contributors_enabled: false,
-//         is_translator: false,
-//         profile_background_color: '642D8B',
-//         profile_background_image_url: 'http://pbs.twimg.com/profile_background_images/679082751690039297/ArImomTA.jpg',
-//         profile_background_image_url_https: 'https://pbs.twimg.com/profile_background_images/679082751690039297/ArImomTA.jpg',
-//         profile_background_tile: true,
-//         profile_link_color: 'FF0000',
-//         profile_sidebar_border_color: 'FFFFFF',
-//         profile_sidebar_fill_color: 'DDFFCC',
-//         profile_text_color: '333333',
-//         profile_use_background_image: true,
-//         profile_image_url: 'http://pbs.twimg.com/profile_images/973551069404987392/Ftpo7Rg5_normal.jpg',
-//         profile_image_url_https: 'https://pbs.twimg.com/profile_images/973551069404987392/Ftpo7Rg5_normal.jpg',
-//         profile_banner_url: 'https://pbs.twimg.com/profile_banners/50323173/1501272451',
-//         default_profile: false,
-//         default_profile_image: false,
-//         following: null,
-//         follow_request_sent: null,
-//         notifications: null },
-//      geo: null,
-//      coordinates: null,
-//      place: null,
-//      contributors: null,
-//      is_quote_status: false,
-//      quote_count: 22,
-//      reply_count: 21,
-//      retweet_count: 126,
-//      favorite_count: 607,
-//      entities: 
-//       { hashtags: [],
-//         urls: [Array],
-//         user_mentions: [Array],
-//         symbols: [] },
-//      favorited: false,
-//      retweeted: false,
-//      possibly_sensitive: false,
-//      filter_level: 'low',
-//      lang: 'en' },
-//   is_quote_status: false,
-//   quote_count: 0,
-//   reply_count: 0,
-//   retweet_count: 0,
-//   favorite_count: 0,
-//   entities: 
-//    { hashtags: [],
-//      urls: [ [Object] ],
-//      user_mentions: [ [Object], [Object] ],
-//      symbols: [] },
-//   favorited: false,
-//   retweeted: false,
-//   possibly_sensitive: false,
-//   filter_level: 'low',
-//   lang: 'en',
-//   timestamp_ms: '1523053327468' }
-
-
-
-// const getBearerToken = (cb) => {
-//   const key = config.CONSUMER_KEY + ':' + config.CONSUMER_SECRET;
-//   console.log('your key is', key);
-//   const options = {
-//     url: `https://api.twitter.com/oauth2/token`,
-//     headers: {
-//       //'Host': 'api.twitter.com',
-//       //'User-Agent': 'My Twitter App v1.0.23',
-//       'Authorization': `Basic ${key} ==`,
-//       // 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-//       // 'Content-Length': '29',
-//       'Accept-Encoding': 'gzip'
-//     },
-//     formData: {'grant_type':'client_credentials'}
-//   }
-//   request.post(options, (err, res, body) => {
-//     if (err) throw err;
-//     console.log('res from twitter is', res);
-//     console.log('body from twitter is', body);
-//     cb(body);
-//   });
-// }
