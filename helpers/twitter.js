@@ -4,20 +4,19 @@ const config = require('../config.js');
 const db = require('../database/index.js');
 
 let client = new Twitter({
-  consumer_key: config.CONSUMER_KEY,
-  consumer_secret: config.CONSUMER_SECRET,
-  access_token_key: config.ACCESS_TOKEN_KEY,
-  access_token_secret: config.ACCESS_TOKEN_SECRET
+  consumer_key: process.env.CONSUMER_KEY || config.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET || config.CONSUMER_SECRET,
+  access_token_key: process.env.ACCESS_TOKEN_KEY || config.ACCESS_TOKEN_KEY,
+  access_token_secret: process.env.ACCESS_TOKEN_SECRET || config.ACCESS_TOKEN_SECRET
 });
  
-const params = {screen_name: config.SCREEN_NAME};
+const params = {screen_name: process.env.SCREEN_NAME || config.SCREEN_NAME};
 const rtInterval = 60000; // the interval after which to recheck a tweet
 const rtDif = 1; //the number of rts during the interval that make a tweet count as hot
 
 const stream = (query) => {
   //To do: add these to a db too and add an option to easily add new people to follow this way
   const params = {
-    // follow: '50323173, 178580925, 1071182324, 23378774, 30074516, 772164285388709888, 416814339' //should be based on user input and who they want to follow
     track: query
   };
 
