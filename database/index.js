@@ -1,8 +1,11 @@
 const twitter = require('../helpers/twitter.js');
 const mongoose = require('mongoose');
-const config = require('../config.js');
+// const config = require('../config.js');
+const DB_USER = process.env.DB_USER || require('../config.js').DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD || require('../config.js').DB_PASSWORD;
+
 // mongoose.connect('mongodb://localhost/tweets');
-mongoose.connect(`mongodb://${process.env.DB_USER || config.DB_USER}:${process.env.DB_PASSWORD || config.DB_PASSWORD}@ds237979.mlab.com:37979/tweets`)
+mongoose.connect(`mongodb://${DB_USER}:${DB_PASSWORD}@ds237979.mlab.com:37979/tweets`)
 
 let tweetSchema = mongoose.Schema({
   id: {type: Number, unique: true}, //make unique!

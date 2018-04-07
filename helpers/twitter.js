@@ -1,13 +1,17 @@
 const request = require('request');
 const Twitter = require('twitter');
-const config = require('../config.js');
+// const config = require('../config.js');
 const db = require('../database/index.js');
+CONSUMER_KEY = process.env.CONSUMER_KEY || require('../config.js').CONSUMER_KEY;
+CONSUMER_SECRET = process.env.CONSUMER_SECRET || require('../config.js').CONSUMER_SECRET;
+ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY || require('../config.js').ACCESS_TOKEN_KEY;
+ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || require('...config.js').ACCESS_TOKEN_SECRET;
 
 let client = new Twitter({
-  consumer_key: process.env.CONSUMER_KEY || config.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET || config.CONSUMER_SECRET,
-  access_token_key: process.env.ACCESS_TOKEN_KEY || config.ACCESS_TOKEN_KEY,
-  access_token_secret: process.env.ACCESS_TOKEN_SECRET || config.ACCESS_TOKEN_SECRET
+  consumer_key: CONSUMER_KEY,
+  consumer_secret: CONSUMER_SECRET,
+  access_token_key: ACCESS_TOKEN_KEY,
+  access_token_secret: ACCESS_TOKEN_SECRET
 });
  
 const params = {screen_name: process.env.SCREEN_NAME || config.SCREEN_NAME};
