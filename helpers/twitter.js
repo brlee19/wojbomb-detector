@@ -1,6 +1,7 @@
 const request = require('request');
 const Twitter = require('twitter');
 const config = require('../config.js');
+const db = require('../database/index.js');
 
 /*Sample tweet data
 { created_at: 'Mon Mar 19 19:26:50 +0000 2018',
@@ -126,10 +127,17 @@ const streamNBA = () => {
 
   client.stream('statuses/filter', params, function(stream) {
     stream.on('data', function(tweet) {
-      // if (tweet.text.slice(0,2) !== 'RT') { // check it's not RT
-      //   console.log(tweet);
-      // }
-      console.log(tweet.text);
+      if (tweet.text.slice(0,2) !== 'RT') { // check it's not RT
+        //console.log('trying to save tweet');
+        db.saveTweet(tweet)
+          .then(() => {
+            console.log('saved tweet successfully');
+          })
+          .catch(() => {
+            console.log('unable to save tweet in DB :(');
+          })
+      }
+      // console.log(tweet.text);
       // add tweet to db
       // setTimeout for x minutes
       // check up on tweet again

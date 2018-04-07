@@ -12,7 +12,14 @@ let tweetSchema = mongoose.Schema({
 let Tweet = mongoose.model('Tweet', tweetSchema);
 
 const saveTweet = (tweet) => { //will generally be saving 1 tweet at a time, not in a collection
-  return tweet.save(); //returns a promise?
+  return new Tweet({
+    id: tweet.id,
+    text: tweet.text,
+    userId: tweet.user.id,
+    userHandle: tweet.user.screen_name,
+    RTs: tweet.retweet_count
+  }).save();
+  //return tweet.save(); //returns a promise?
 }
 
 const searchTweetById = (id) => { //returns a promise b/c of exec?
@@ -20,3 +27,6 @@ const searchTweetById = (id) => { //returns a promise b/c of exec?
               .limit(1)
               .exec()
 };
+
+exports.saveTweet = saveTweet;
+exports.searchTweetById = searchTweetById;
