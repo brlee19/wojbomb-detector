@@ -10,14 +10,23 @@ class App extends React.Component {
     this.state = { 
       tweets: []
     }
+    this.updateHotTweets = this.updateHotTweets.bind(this);
+    setInterval(() => {
+      this.updateHotTweets();
+    }, 5000);
   }
 
-  componentDidMount() {
+  updateHotTweets() {
+    console.log('checking for hot tweets!')
     axios.get('/hot')
       .then((resp) => {
         this.setState({tweets: resp.data});
       })
       .catch(err => console.log('axios err', err));
+  }
+
+  componentDidMount() {
+    this.updateHotTweets();
   }
 
   render () {

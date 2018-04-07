@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// twitter.streamNBA();
+twitter.stream('NBA');
 
 // app.get('/', (req, res) => {
 //   console.log('get request for index.html');
@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 app.get('/hot', (req, res) => { 
   return db.getHotTweets().then((data) => {
-      console.log(`data from getHotTweets is ${data}`);
+      // console.log(`data from getHotTweets is ${data}`);
       res.send(data);
     }).catch(err => {
       console.log(err);

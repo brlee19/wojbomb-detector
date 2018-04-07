@@ -36,7 +36,7 @@ const searchTweetById = (id) => { //returns a promise b/c of exec?
 };
 
 const flagTweetAsHot = (id, retweets) => {
-  return Tweet.findOneAndUpdate({id: id}, {RTs: retweets}, {hot: true})
+  return Tweet.findOneAndUpdate({id: id}, {$set: {RTs: retweets, hot: true}})
 }
 
 const getHotTweets = () => {
