@@ -11,7 +11,7 @@ let client = new Twitter({
 });
  
 const params = {screen_name: config.SCREEN_NAME};
-const rtInterval = 60000; // the interval after which to recheck a tweet
+const rtInterval = 6000; // the interval after which to recheck a tweet
 const rtDif = 1; //the number of rts during the interval that make a tweet count as hot
 
 const stream = (query) => {
@@ -60,11 +60,15 @@ const checkRTIncrease = (id, oldRetweetCount) => {
           if (err) console.log(err);
           if (data) console.log('saved hot tweet');
         });
+      } else {
+        console.log('trying to delete tweet with id', tweet.id_str);
+        db.deleteTweet(tweet.id_str)
+          .then((deleted) => console.log('deleted tweet?', deleted))
+          .catch(err => console.log('error trying to delete tweet', err));
       }
-      //if enough of a difference, change the hot field to true (get request by client later returns only these hot tweets)
+      //else delete tweet from DB so it doesn't store a billion tweets
     }
   });
-    //make another get request to twitter by ID
 }
 
 const getTweetById = (strId, cb) => {

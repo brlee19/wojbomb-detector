@@ -47,8 +47,13 @@ const getHotTweets = () => {
   return Tweet.find({hot: true}).exec();
 }
 
+const deleteTweet = (strId) => {
+  return Tweet.findOneAndRemove({strId: strId});
+}
+
 exports.saveTweet = saveTweet;
 exports.searchTweetById = searchTweetById;
 exports.flagTweetAsHot = flagTweetAsHot;
 exports.getHotTweets = getHotTweets;
+exports.deleteTweet = deleteTweet;
 // exports.checkRTIncrease = checkRTIncrease;
