@@ -26,6 +26,7 @@ const stream = (query) => {
   client.stream('statuses/filter', params, function(stream) {
     stream.on('data', function(tweet) {
       if (tweet.text.slice(0,2) !== 'RT') {
+        console.log(tweet.text);
         db.saveTweet(tweet)
           .then((data) => {
             // console.log('saved tweet successfully');
@@ -63,7 +64,7 @@ const checkRTIncrease = (id, oldRetweetCount) => {
       } else {
         // console.log('trying to delete tweet with id', tweet.id_str);
         db.deleteTweet(tweet.id_str)
-          .then((deleted) => {console.log('deleted tweet with id_str', tweet.id_str)})
+          .then((deleted) => {/*console.log('deleted tweet with id_str', tweet.id_str)*/})
           .catch(err => console.log('error trying to delete tweet', err));
       }
     }

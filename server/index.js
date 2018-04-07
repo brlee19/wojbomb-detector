@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-twitter.stream('NBA');
+// twitter.stream('NBA');
 
 app.get('/hot', (req, res) => { 
   return db.getHotTweets().then((data) => {
@@ -23,8 +23,11 @@ app.get('/hot', (req, res) => {
     });
 })
 
-app.post('/', (req, res) => { //add user to follow
-  console.log(req.body.user);
+app.post('/*', (req, res) => { //add user to follow
+  console.log('post request body is', req.body);
+  //NEED TO CLOSE THE ORIGINAL STREAM
+  // console.log('nba stream is', nbaStream);
+  twitter.stream(req.body.query);
   res.send('got it');
   //save user into the DB
 });
