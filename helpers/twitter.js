@@ -3,82 +3,6 @@ const Twitter = require('twitter');
 const config = require('../config.js');
 const db = require('../database/index.js');
 
-/*Sample tweet data
-{ created_at: 'Mon Mar 19 19:26:50 +0000 2018',
-    id: 975815880268550100,
-    id_str: '975815880268550144',
-    text: 'OKAY ITS OFFICIAL MY DAD JUST ASKED @rogerfederer IF TENNIS BALLS ARE YELLOW OR GREEN AND HE SAID THEY ARE YELLOW https://t.co/EXdXRr0oFa',
-    truncated: false,
-    entities: 
-     { hashtags: [],
-       symbols: [],
-       user_mentions: [Array],
-       urls: [],
-       media: [Array] },
-    extended_entities: { media: [Array] },
-    source: '<a href="http://twitter.com/download/iphone" rel="nofollow">Twitter for iPhone</a>',
-    in_reply_to_status_id: null,
-    in_reply_to_status_id_str: null,
-    in_reply_to_user_id: null,
-    in_reply_to_user_id_str: null,
-    in_reply_to_screen_name: null,
-    user: 
-     { id: 1319105738,
-       id_str: '1319105738',
-       name: 'Delaney Dold',
-       screen_name: 'delaneyanndold',
-       location: 'El Dorado, KS',
-       description: 'SC: laneyann99',
-       url: 'https://t.co/edk4Bb6FRA',
-       entities: [Object],
-       protected: false,
-       followers_count: 1256,
-       friends_count: 1241,
-       listed_count: 8,
-       created_at: 'Sun Mar 31 20:52:09 +0000 2013',
-       favourites_count: 73823,
-       utc_offset: -25200,
-       time_zone: 'Pacific Time (US & Canada)',
-       geo_enabled: true,
-       verified: false,
-       statuses_count: 12036,
-       lang: 'en',
-       contributors_enabled: false,
-       is_translator: false,
-       is_translation_enabled: false,
-       profile_background_color: '000000',
-       profile_background_image_url: 'http://abs.twimg.com/images/themes/theme1/bg.png',
-       profile_background_image_url_https: 'https://abs.twimg.com/images/themes/theme1/bg.png',
-       profile_background_tile: false,
-       profile_image_url: 'http://pbs.twimg.com/profile_images/887456403958493184/Sod3mLpb_normal.jpg',
-       profile_image_url_https: 'https://pbs.twimg.com/profile_images/887456403958493184/Sod3mLpb_normal.jpg',
-       profile_banner_url: 'https://pbs.twimg.com/profile_banners/1319105738/1497126722',
-       profile_link_color: '3B94D9',
-       profile_sidebar_border_color: '000000',
-       profile_sidebar_fill_color: '000000',
-       profile_text_color: '000000',
-       profile_use_background_image: false,
-       has_extended_profile: true,
-       default_profile: false,
-       default_profile_image: false,
-       following: false,
-       follow_request_sent: false,
-       notifications: false,
-       translator_type: 'none' },
-    geo: null,
-    coordinates: null,
-    place: null,
-    contributors: null,
-    is_quote_status: false,
-    retweet_count: 2151,
-    favorite_count: 7719,
-    favorited: true,
-    retweeted: false,
-    possibly_sensitive: false,
-    lang: 'en' }
-
-*/
-
 let client = new Twitter({
   consumer_key: config.CONSUMER_KEY,
   consumer_secret: config.CONSUMER_SECRET,
@@ -95,27 +19,27 @@ const getFaves = (cb) => {
   });
 }
 
-const searchNBA = (cb) => {
-  client.get('search/tweets', {q: 'nba'}, (err, tweets, res) => {
-    // console.log('tweets are', tweets.statuses);
-    const date = new Date();
-    console.log('current date is', date);
-    mappedTweets = (tweets.statuses).map(tweet => {
-      return {
-        tweetId: tweet.id,
-        text: tweet.text,
-        user: tweet.user.id,
-        screenName: tweet.user.screen_name,
-        RTs: [{date: new Date(), retweets: tweet.retweet_count}] //need to store dates with RTs to compare
-        //faves: {faves: tweet.favorite_count}
-        //need to save current time too
-      };
-      // return tweet
-    });
-    console.log('tweets are', JSON.stringify(mappedTweets));
-    cb(mappedTweets);
-  });
-}
+// const searchNBA = (cb) => {
+//   client.get('search/tweets', {q: 'nba'}, (err, tweets, res) => {
+//     // console.log('tweets are', tweets.statuses);
+//     const date = new Date();
+//     console.log('current date is', date);
+//     mappedTweets = (tweets.statuses).map(tweet => {
+//       return {
+//         tweetId: tweet.id,
+//         text: tweet.text,
+//         user: tweet.user.id,
+//         screenName: tweet.user.screen_name,
+//         RTs: [{date: new Date(), retweets: tweet.retweet_count}] //need to store dates with RTs to compare
+//         //faves: {faves: tweet.favorite_count}
+//         //need to save current time too
+//       };
+//       // return tweet
+//     });
+//     console.log('tweets are', JSON.stringify(mappedTweets));
+//     cb(mappedTweets);
+//   });
+// }
 
 const streamNBA = () => {
   const params = {
@@ -127,11 +51,16 @@ const streamNBA = () => {
 
   client.stream('statuses/filter', params, function(stream) {
     stream.on('data', function(tweet) {
-      if (tweet.text.slice(0,2) !== 'RT') { // check it's not RT
-        //console.log('trying to save tweet');
+      if (tweet.text.slice(0,2) !== 'RT') {
         db.saveTweet(tweet)
-          .then(() => {
+          .then((data) => {
             console.log('saved tweet successfully');
+            console.log('data here is', data);
+            //data.id is the tweet ID
+            //setTimeout and check up on tweet later
+            setTimeout(function() {
+              db.checkRTIncrease(data.id);
+            }, 5000);
           })
           .catch(() => {
             console.log('unable to save tweet in DB :(');
@@ -151,10 +80,25 @@ const streamNBA = () => {
   });
 }
 
+const getTweetById = (strId) => {
+  client.get('statuses/show', {id: strId}, function(error, tweet, response) {
+    if (error) {
+      console.log(error);
+      throw error;
+    }
+    else {
+      console.log('searched for tweet by id and got', tweet);
+    }
+    // console.log(tweet);  
+    // console.log(response);  
+  });
+}
+
 // exports.getBearerToken = getBearerToken;
 exports.getFaves = getFaves;
-exports.searchNBA = searchNBA;
+// exports.searchNBA = searchNBA;
 exports.streamNBA = streamNBA;
+exports.getTweetById = getTweetById;
 
 // SAMPLE RT
 

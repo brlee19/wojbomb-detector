@@ -44,6 +44,11 @@ app.post('/', (req, res) => { //add user to follow
   //save user into the DB
 });
 
+app.get('/*', (req, res) => {
+  twitter.getTweetById(req.url);
+  res.send('tried searching by id');
+});
+
 app.listen(port, function() {
   console.log(`listening on port ${port}`);
 });
