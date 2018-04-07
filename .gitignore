@@ -13,6 +13,7 @@ pids
 
 # Key
 config.js
+.env
 
 # OSX
 .DS_Store
