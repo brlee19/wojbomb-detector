@@ -5,7 +5,11 @@ const twitter = require('../helpers/twitter.js');
 const db = require('../database/index.js');
 
 let app = express();
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
+
 twitter.streamNBA();
 
 app.get('/', (req, res) => {
@@ -13,25 +17,14 @@ app.get('/', (req, res) => {
   res.send('Hello world!');
 });
 
-// app.get('/bearer', (req, res) => {
-//   console.log('trying to get bearer token YOLO');
-//   twitter.getBearerToken((token) => {
-//     console.log('token is', token);
-//   });
-//   res.send('tried to get bearer token');
-// });
-
-app.get('/faves', (req, res) => {
-  twitter.getFaves(tweets => {
-    let tweetText = tweets.map(tweet => {
-      return tweet.text;
-    })
-    res.send(tweetText);
-  });
-})
-
-app.get('/hot', (req, res) => {
-
+app.get('/hot', (req, res) => { 
+  return db.getHotTweets().then((data) => {
+      console.log(`data from getHotTweets is ${data}`);
+      res.send(data);
+    }).catch(err => {
+      console.log(err);
+      res.end();
+    });
 })
 
 app.post('/', (req, res) => { //add user to follow
