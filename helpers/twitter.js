@@ -15,6 +15,7 @@ const rtInterval = 300000; // the interval after which to recheck a tweet
 const rtDif = 5; //the number of rts during the interval that make a tweet count as hot
 
 const streamNBA = () => {
+  //To do: add these to a db too and add an option to easily add new people to follow this way
   const params = {
     // follow: '50323173, 178580925, 1071182324, 23378774, 30074516, 772164285388709888, 416814339' //should be based on user input and who they want to follow
     track: 'NBA'
